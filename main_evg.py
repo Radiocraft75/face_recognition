@@ -1,28 +1,18 @@
 import cv2
 import pafy
-#import dlib.cuda as cuda
 import face_recognition
 import numpy as np
 
 skip_frame = 3
 
-# Open the input movie file
-input_movie = cv2.VideoCapture("video/hamilton_clip.mp4")
-length = int(input_movie.get(cv2.CAP_PROP_FRAME_COUNT))
+video_capture = cv2.VideoCapture("rtsp://admin:ultrabook75@192.168.0.64:554/ISAPI/Streaming/Channels/101")
 
-# Create an output movie file (make sure resolution/frame rate matches input video!)
-fourcc = cv2.VideoWriter_fourcc(*'XVID')
-output_movie = cv2.VideoWriter('video/output.avi', fourcc, 29.97, (640, 360))
-
-# Get a reference to webcam
-#print(cuda.get_num_devices())
-# url = "https://youtu.be/1sHyjr-86uY"
-# video = pafy.new(url)
-# best = video.getbest(preftype="mp4")
-
-#video_capture = cv2.VideoCapture("rtsp://admin:ultrabook75@192.168.0.64:554/ISAPI/Streaming/Channels/101")
-#video_capture = cv2.VideoCapture(best.url)
-#video_capture = cv2.VideoCapture(0)
+# Размер начальной картинки 3840*2160
+# Размер картинки для вывода на экран
+desired_width = 1080
+aspect_ratio = desired_width / 3840
+desired_height = int(2160 * aspect_ratio)
+dim = (desired_width, desired_height)
 
 face_locations = []
 face_encodings = []
@@ -32,15 +22,15 @@ known_face_encodings = []
 
 index = 0
 while True:
-    # ret, frame = video_capture.read()
-    ret, frame = input_movie.read()
+    ret, frame = video_capture.read()
+    #ret, frame = input_movie.read()
     
     if not ret:    	
         break
 
     if index == skip_frame:
         rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        # rgb_frame = rgb_frame[100:500, 100:1000]
+        rgb_frame = rgb_frame[100:500, 100:1000]
 
         # Находим лица в области rgb_frame
         face_locations = face_recognition.face_locations(rgb_frame, model="cnn")
@@ -90,8 +80,9 @@ while True:
 
         index = 0
         # Рисуем зеленый квадрат вокруг области поиска лиц
-        # cv2.rectangle(frame, (100, 100), (1000, 500), (0, 255, 0), 2)
+        cv2.rectangle(frame, (1600, 800), (1900, 1150), (0, 255, 0), 5)
 
+        frame = cv2.resize(frame, dsize=dim, interpolation=cv2.INTER_AREA)
         cv2.imshow('Input', frame)
     index += 1
 
@@ -100,6 +91,6 @@ while True:
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
-# video_capture.release()
-input_movie.release()
+video_capture.release()
+#input_movie.release()
 cv2.destroyAllWindows()
