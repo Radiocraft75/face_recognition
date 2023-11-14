@@ -14,6 +14,12 @@ aspect_ratio = desired_width / 3840
 desired_height = int(2160 * aspect_ratio)
 dim = (desired_width, desired_height)
 
+# Облабть обработки
+x1 = 1600
+x2 = 1900
+y1 = 800
+y2 = 1150
+
 face_locations = []
 face_encodings = []
 
@@ -23,21 +29,19 @@ known_face_encodings = []
 index = 0
 while True:
     ret, frame = video_capture.read()
-    #ret, frame = input_movie.read()
+    
+    # ббрезаем изображение до ожлажти поипка
+    frame2 = frame[y1:y2, x1:x2]
     
     if not ret:    	
         break
 
     if index == skip_frame:
-        rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        rgb_frame = rgb_frame[100:500, 100:1000]
-
+        rgb_frame = cv2.cvtColor(frame2, cv2.COLOR_BGR2RGB)
+        
         # Находим лица в области rgb_frame
         face_locations = face_recognition.face_locations(rgb_frame, model="cnn")
-        face_encodings = face_recognition.face_encodings(rgb_frame, face_locations)
-        # for top, right, bottom, left in face_locations:
-        #     cv2.rectangle(frame, (left+100, top+100), (right+100, bottom+100), (0, 0, 255), 2)        
-        
+        face_encodings = face_recognition.face_encodings(rgb_frame, face_locations)      
 
         # Loop through each face in this frame of video
         for (top, right, bottom, left), face_encoding in zip(face_locations, face_encodings):
@@ -56,35 +60,34 @@ while True:
             if poisk:
                 #print("Присутстует в базе")
                 # Draw a label with a name below the face
-                cv2.rectangle(frame, (left, bottom - 35), (right, bottom), (0, 255, 0), cv2.FILLED)
+                cv2.rectangle(frame2, (left, bottom - 35), (right, bottom), (0, 255, 0), cv2.FILLED)
                 font = cv2.FONT_HERSHEY_DUPLEX
-                cv2.putText(frame, "OK", (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
+                cv2.putText(frame2, "OK", (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
                 # Draw a box around the face
-                cv2.rectangle(frame, (left, top), (right, bottom), (0, 255, 0), 2)
+                cv2.rectangle(frame2, (left, top), (right, bottom), (0, 255, 0), 2)
             else:
                 print("Добавить в базу нового")
                 print(len(known_face_encodings))
                 known_face_encodings.append(face_encoding)
                 # Draw a label with a name below the face
-                cv2.rectangle(frame, (left, bottom - 35), (right, bottom), (0, 0, 255), cv2.FILLED)
+                cv2.rectangle(frame2, (left, bottom - 35), (right, bottom), (0, 0, 255), cv2.FILLED)
                 font = cv2.FONT_HERSHEY_DUPLEX
-                cv2.putText(frame, "NEW", (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
+                cv2.putText(frame2, "NEW", (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
                 # Draw a box around the face
-                cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 2)
+                cv2.rectangle(frame2, (left, top), (right, bottom), (0, 0, 255), 2)
 
-            # Or instead, use the known face with the smallest distance to the new face
-            #face_distances = face_recognition.face_distance(known_face_encodings, face_encoding)
-            #best_match_index = np.argmin(face_distances)
-            # if matches[best_match_index]:
-            #     name = known_face_names[best_match_index]
-
-        index = 0
-        # Рисуем зеленый квадрат вокруг области поиска лиц
-        cv2.rectangle(frame, (1600, 800), (1900, 1150), (0, 255, 0), 5)
-
-        frame = cv2.resize(frame, dsize=dim, interpolation=cv2.INTER_AREA)
-        cv2.imshow('Input', frame)
+        index = 0       
+        
+        cv2.imshow('Input1', frame2)
+        
     index += 1
+
+    
+    # Рисуем зеленый квадрат вокруг области поиска лиц
+    cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 5)
+
+    frame = cv2.resize(frame, dsize=dim, interpolation=cv2.INTER_AREA)
+    cv2.imshow('Input', frame)
 
     # Display the resulting image
     # Hit 'q' on the keyboard to quit!
