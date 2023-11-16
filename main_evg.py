@@ -1,12 +1,14 @@
+import os
 import cv2
 import pafy
 import face_recognition
 import numpy as np
+import pickle
 
 skip_frame = 3
 
 video_capture = cv2.VideoCapture("rtsp://admin:ultrabook75@192.168.0.64:554/ISAPI/Streaming/Channels/101")
-
+file_path = "kfe.npy"
 # Размер начальной картинки 3840*2160
 # Размер картинки для вывода на экран
 desired_width = 1080
@@ -14,17 +16,30 @@ aspect_ratio = desired_width / 3840
 desired_height = int(2160 * aspect_ratio)
 dim = (desired_width, desired_height)
 
-# Облабть обработки
+"""
+Облабть обработки
+#     x1,y1_____________
+#     |                 |
+#     |                 |
+#     |_________________x2,y2
+"""
 x1 = 1600
-x2 = 1900
+x2 = 1750
 y1 = 800
-y2 = 1150
+y2 = 1050
 
 face_locations = []
 face_encodings = []
 
 # Create arrays of known face encodings and their names
-known_face_encodings = []
+if os.path.isfile(file_path):
+    known_face_encodings = np.load("kfe.npy").tolist()
+else:
+    known_face_encodings = []
+
+print("Чтение данных")
+print("Вcего в юазе:")
+print(len(known_face_encodings))
 
 index = 0
 while True:
@@ -67,8 +82,8 @@ while True:
                 cv2.rectangle(frame2, (left, top), (right, bottom), (0, 255, 0), 2)
             else:
                 print("Добавить в базу нового")
-                print(len(known_face_encodings))
                 known_face_encodings.append(face_encoding)
+                print(len(known_face_encodings))
                 # Draw a label with a name below the face
                 cv2.rectangle(frame2, (left, bottom - 35), (right, bottom), (0, 0, 255), cv2.FILLED)
                 font = cv2.FONT_HERSHEY_DUPLEX
@@ -81,19 +96,19 @@ while True:
         cv2.imshow('Input1', frame2)
         
     index += 1
-
     
     # Рисуем зеленый квадрат вокруг области поиска лиц
     cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 5)
-
+    # Display the resulting image
     frame = cv2.resize(frame, dsize=dim, interpolation=cv2.INTER_AREA)
     cv2.imshow('Input', frame)
 
-    # Display the resulting image
+   
     # Hit 'q' on the keyboard to quit!
     if cv2.waitKey(1) & 0xFF == ord('q'):
+        if (len(known_face_encodings) != 0):
+            np.save("kfe.npy", known_face_encodings)
         break
 
 video_capture.release()
-#input_movie.release()
 cv2.destroyAllWindows()
