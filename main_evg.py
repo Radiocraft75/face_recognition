@@ -38,7 +38,7 @@ else:
     known_face_encodings = []
 
 print("Чтение данных")
-print("Вcего в юазе:")
+print("Total in the database:")
 print(len(known_face_encodings))
 
 # #Write video from testing
