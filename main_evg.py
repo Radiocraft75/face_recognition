@@ -41,9 +41,16 @@ print("Чтение данных")
 print("Вcего в юазе:")
 print(len(known_face_encodings))
 
+# #Write video from testing
+# # Create an output movie file (make sure resolution/frame rate matches input video!)
+# fourcc = cv2.VideoWriter_fourcc(*'XVID')
+# output_movie = cv2.VideoWriter('output.avi', fourcc, 29.97, (3840, 2160))
+
 index = 0
 while True:
     ret, frame = video_capture.read()
+
+    # output_movie.write(frame)
     
     # ббрезаем изображение до ожлажти поипка
     frame2 = frame[y1:y2, x1:x2]
@@ -62,7 +69,7 @@ while True:
         for (top, right, bottom, left), face_encoding in zip(face_locations, face_encodings):
 
             # See if the face is a match for the known face(s)
-            matches = face_recognition.compare_faces(known_face_encodings, face_encoding, tolerance=0.6)
+            matches = face_recognition.compare_faces(known_face_encodings, face_encoding, tolerance=0.8)
 
             poisk = False
             if True in matches:
@@ -111,4 +118,5 @@ while True:
         break
 
 video_capture.release()
+# output_movie.release()
 cv2.destroyAllWindows()
