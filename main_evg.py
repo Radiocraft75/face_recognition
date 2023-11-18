@@ -3,6 +3,7 @@ import cv2
 import pafy
 import face_recognition
 import numpy as np
+import schedule
 
 skip_frame = 3
 
@@ -49,13 +50,18 @@ print("Чтение данных")
 print("Total in the database:")
 print(len(known_face_encodings))
 
-# #Write video from testing
-# # Create an output movie file (make sure resolution/frame rate matches input video!)
-# fourcc = cv2.VideoWriter_fourcc(*'XVID')
-# output_movie = cv2.VideoWriter('output.avi', fourcc, 29.97, (3840, 2160))
+
+# Настройка расписания очистки списка известных лиц
+def clear_array():
+    print("Clear known face")
+    known_face_encodings.clear()
+    index = 0
+
+schedule.every().day.at("00:01").do(clear_array)
 
 index = 0
 while True:
+    schedule.run_pending()
     ret, frame = video_capture.read()
     
     # ббрезаем изображение до ожлажти поипка
@@ -122,7 +128,7 @@ while True:
                 cv2.rectangle(frame2, (left, top), (right, bottom), (0, 0, 255), 2)
 
         index = 0       
-        # cv2.imshow('Input1', frame2)        
+        cv2.imshow('Input1', frame2)        
     index += 1
     
     # Рисуем зеленый квадрат вокруг области поиска лиц
@@ -134,8 +140,8 @@ while True:
    
     # Hit 'q' on the keyboard to quit!
     if cv2.waitKey(1) & 0xFF == ord('q'):
-        # if (len(known_face_encodings) != 0):
-        #     np.save("kfe.npy", known_face_encodings)
+        if (len(known_face_encodings) != 0):
+            np.save("kfe.npy", known_face_encodings)
         break
 
 video_capture.release()
