@@ -4,6 +4,8 @@ import datetime
 
 video_capture = cv2.VideoCapture("rtsp://admin:ultrabook75@192.168.0.64:554/ISAPI/Streaming/Channels/101")
 
+# #Write video from testing
+# # Create an output movie file (make sure resolution/frame rate matches input video!)
 now = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
 fourcc = cv2.VideoWriter_fourcc(*'XVID')
 output_movie = cv2.VideoWriter('video/' + now + '_fo_test.avi', fourcc, 29.97, (3840, 2160))
@@ -14,11 +16,6 @@ desired_width = 1080
 aspect_ratio = desired_width / 3840
 desired_height = int(2160 * aspect_ratio)
 dim = (desired_width, desired_height)
-
-# #Write video from testing
-# # Create an output movie file (make sure resolution/frame rate matches input video!)
-fourcc = cv2.VideoWriter_fourcc(*'XVID')
-output_movie = cv2.VideoWriter('output.avi', fourcc, 29.97, (3840, 2160))
 
 while True:
     ret, frame = video_capture.read()
