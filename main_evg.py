@@ -7,10 +7,10 @@ import schedule
 
 skip_frame = 3
 
-# video_capture = cv2.VideoCapture("rtsp://admin:ultrabook75@192.168.0.64:554/ISAPI/Streaming/Channels/101")
+video_capture = cv2.VideoCapture("rtsp://admin:ultrabook75@192.168.0.64:554/ISAPI/Streaming/Channels/101")
 
-video_capture = cv2.VideoCapture("video/fo_test.avi")
-length = int(video_capture.get(cv2.CAP_PROP_FRAME_COUNT))
+# video_capture = cv2.VideoCapture("video/fo_test.avi")
+# length = int(video_capture.get(cv2.CAP_PROP_FRAME_COUNT))
 
 file_path = "kfe.npy"
 # Размер начальной картинки 3840*2160
@@ -27,15 +27,15 @@ dim = (desired_width, desired_height)
 #     |                 |
 #     |_________________x2,y2
 """
-# x1 = 1600
-# x2 = 1750
-# y1 = 800
-# y2 = 1050
+x1 = 1600
+x2 = 1750
+y1 = 800
+y2 = 1050
 
-x1 = 1250
-x2 = 2400
-y1 = 750
-y2 = 1800
+# x1 = 1250
+# x2 = 2400
+# y1 = 750
+# y2 = 1800
 
 face_locations = []
 face_encodings = []
@@ -55,9 +55,10 @@ print(len(known_face_encodings))
 def clear_array():
     print("Clear known face")
     known_face_encodings.clear()
+    os.remove("kfe.npy")
     index = 0
 
-schedule.every().day.at("00:01").do(clear_array)
+schedule.every().day.at("00:00").do(clear_array)
 
 index = 0
 while True:
